@@ -5,7 +5,8 @@
 A Command & Control server for managing a malware campaign and bot net.
 
 **Features:**
-- CLI to manage targets, groups of targets, phishing emails, scheduled and repeated tasks, and data exfiltration
+- CLI to manage implants, targets, groups of targets, phishing emails, scheduled and repeated tasks, and data exfiltration
+- Implant and vulnerability agnostic
 - Target specific implants, tasks, and exfiltrations
 - Dashboard to interact with C2 database: Search, filter, update targets/tasks/collected data
 
