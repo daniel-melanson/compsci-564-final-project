@@ -1,0 +1,23 @@
+version: 1
+config:
+  users:
+    - first_name: admin
+      last_name: admin
+      password: admin
+      email: admin@admin.com
+      is_superuser: true
+  databases:
+    - name: c2-server (Postgres)
+      engine: postgres
+      details:
+        host: db
+        port: 5432
+        user: postgres
+        password: "postgres"
+        dbname: postgres
+  settings:
+    admin-email: null
+    aggregated-query-row-limit: null
+    allowed-iframe-hosts: null
+    anon-tracking-enabled: false
+    application-name: C2 Server

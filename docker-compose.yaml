@@ -1,0 +1,59 @@
+services:
+  cli:
+    build: .
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db
+      - redis
+      - metabase
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  worker:
+    build: .
+    command: ./.venv/bin/celery -A src.tasks worker -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  db:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+  redis:
+    image: redis:alpine
+    volumes:
+      - redisdata:/data
+  metabase:
+    image: metabase/metabase:v0.35.3
+    volumes:
+      - ./configs/:/etc/containers/
+      - metabasedata:/metabase-data
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - MB_DB_TYPE=postgres
+      - MB_DB_HOST=db
+      - MB_DB_PORT=5432
+      - MB_DB_DBNAME=postgres
+      - MB_DB_USER=postgres
+      - MB_DB_PASS=postgres
+      - MB_JETTY_PORT=3000
+      - MB_CONFIG_FILE_PATH=/etc/containers/metabase.yaml
+volumes:
+  pgdata:
+  redisdata:
+  metabasedata:
