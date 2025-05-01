@@ -1,4 +1,5 @@
 from playhouse.postgres_ext import *
+from datetime import datetime
 import re
 import json
 import hashlib
@@ -163,9 +164,9 @@ class Template(BaseModel):
 
 
 class Execution(BaseModel):
-
     id = AutoField(primary_key=True)
-    target = ForeignKeyField(Target)
+    celery_task_id = CharField(unique=True)
+    target = ForeignKeyField(Target, on_delete="CASCADE", related_name="executions")
     status = CharField()
 
     @classmethod
@@ -226,11 +227,62 @@ class Execution(BaseModel):
                 .where(TargetGroup.id << group_ids)
             )
 
-        
+        for target in targets:
+            if answers["command_or_script"] == "command":
+                task = execute_command.delay(target, answers["command"])
+            else:
+                task = execute_script.delay(target, answers["script"])
+
+            cls.create(target=target, status="pending", celery_task_id=task.id)
 
     @classmethod
     def prompt_and_schedule(cls):
-        pass
+        questions = cls.prompt() | {
+            {
+                "type": "confirmation",
+                "name": "repeat",
+                "default": False,
+                "message": "Is this a repeated execution?",
+            },
+            {
+                "type": "text",
+                "name": "cron_schedule",
+                "message": "Enter cron schedule",
+                "when": lambda answers: answers["repeat"],
+            },
+            {
+                "type": "text",
+                "name": "date",
+                "message": "Enter date and time (ISO 8601)",
+                "validate": validate_date,
+                "when": lambda answers: not answers["repeat"],
+            },
+            {
+                "type": "confirmation",
+                "name": "random_offset",
+                "message": "Add random offset to execution time?",
+            },
+            {
+                "type": "text",
+                "name": "random_offset_duration",
+                "message": "Enter random offset duration (e.g. 1d2h3m5s)",
+                "validate": validate_duration,
+                "default": None,
+                "when": lambda answers: answers["random_offset"],
+            },
+        }
+
+        answers = questionary.prompt(questions)
+
+
+def validate_date(date):
+    try:
+        date = datetime.fromisoformat(date)
+    except ValueError:
+        raise questionary.ValidationError("Invalid date format")
+
+    if date < datetime.now():
+        raise questionary.ValidationError("Date must be in the future")
 
 
 def validate_target_id(target_id):
