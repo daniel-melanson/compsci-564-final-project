@@ -7,6 +7,7 @@ name = "pypi"
 peewee = "*"
 celery = {extras = ["redis"], version = "*"}
 psycopg2-binary = "*"
+questionary = "*"
 
 [dev-packages]
 
