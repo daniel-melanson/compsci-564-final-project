@@ -46,26 +46,39 @@ class PhishingEmail(BaseModel):
 
     @classmethod
     def prompt_and_create(cls):
-        result = questionary.prompt(
+        if Target.select().count() == 0:
+            raise ValueError("No targets found")
+        if Group.select().count() == 0:
+            raise ValueError("No groups found")
+
+        answers = questionary.prompt(
             [
                 {
                     "type": "select",
                     "name": "single_or_group",
-                    "message": "Send a phishing email to a single target or a group?",
-                    "choices": ["single", "group"],
+                    "message": "Send a phishing email to a specific target or a group?",
+                    "choices": ["specific", "group"],
                 },
                 {
-                    "type": "text",
-                    "name": "target_id",
-                    "message": "Enter target ID",
-                    "validate": validate_target_id,
-                    "when": lambda answers: answers["single_or_group"] == "single",
+                    "type": "checkbox",
+                    "name": "target_ids",
+                    "message": "Select target(s)",
+                    "choices": Target.choices(),
+                    "validate": lambda targets: (
+                        True
+                        if len(targets) > 0
+                        else "Please select at least one target"
+                    ),
+                    "when": lambda answers: answers["single_or_group"] == "specific",
                 },
                 {
                     "type": "checkbox",
                     "name": "target_groups",
                     "message": "Select target group(s)",
                     "choices": Group.choices(),
+                    "validate": lambda groups: (
+                        True if len(groups) > 0 else "Please select at least one group"
+                    ),
                     "when": lambda answers: answers["single_or_group"] == "group",
                 },
                 {
@@ -83,13 +96,14 @@ class PhishingEmail(BaseModel):
             ]
         )
 
-        if result["single_or_group"] == "single":
-            targets = [Target.get(id=int(result["target_id"]))]
+        if answers["single_or_group"] == "specific":
+            targets = Target.select().where(Target.id << answers["target_ids"])
         else:
-            targets = Target.select_in_groups(result["target_groups"])
+            assert answers["target_groups"] and len(answers["target_groups"]) > 0
+            targets = Target.select_in_groups(answers["target_groups"])
 
-        template = PhishingEmailTemplate.get(id=int(result["template"]))
-        attachments = Attachment.select().where(Attachment.id << result["attachments"])
+        template = PhishingEmailTemplate.get(id=int(answers["template"]))
+        attachments = Attachment.select().where(Attachment.id << answers["attachments"])
 
         for target in targets:
             phishing_email = cls.create(
@@ -100,7 +114,7 @@ class PhishingEmail(BaseModel):
                 status="pending",
             )
 
-            task = send_phishing_email.delay(phishing_email)
+            task = send_phishing_email.delay(phishing_email.id)
             phishing_email.celery_task_id = task.id
             phishing_email.save()
 
