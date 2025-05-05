@@ -102,7 +102,7 @@ class Target(BaseModel):
             if validate_target_email(email) != True:
                 raise Exception(f"Invalid email: {email}")
 
-            if validate_target_email(data) != True:
+            if validate_target_data(data) != True:
                 raise Exception(f"Invalid data: {data}")
 
             target = cls.create(

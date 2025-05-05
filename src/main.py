@@ -15,7 +15,6 @@ from models import (
 
 def main():
     with db:
-        db.drop_tables([PhishingEmailTemplate], cascade=True)
         db.create_tables(
             [
                 Target,
@@ -72,6 +71,11 @@ def main():
                     PhishingEmailTemplate.prompt_and_create()
                 case "list":
                     PhishingEmailTemplate.list()
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all templates?"
+                    ).ask():
+                        PhishingEmailTemplate.delete().execute()
         case "execution":
             match args.subcommand:
                 case "run":

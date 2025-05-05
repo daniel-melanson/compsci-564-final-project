@@ -1,4 +1,5 @@
 from models.base import BaseModel
+import re
 import os
 import shutil
 import uuid
@@ -13,6 +14,8 @@ def validate_template_name(name):
         return "Template name must be at least 3 characters long"
     elif len(name) > 100:
         return "Template name cannot be longer than 100 characters"
+    elif not re.match(r"^[\w ]+$", name):
+        return "Template name can only contain letters, numbers, and spaces"
     elif (
         PhishingEmailTemplate.select()
         .where(PhishingEmailTemplate.name == name)
