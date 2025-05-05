@@ -15,6 +15,7 @@ from models import (
 
 def main():
     with db:
+        db.drop_tables([PhishingEmailTemplate], cascade=True)
         db.create_tables(
             [
                 Target,
@@ -32,39 +33,12 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command")
 
-    target_parser = subparsers.add_parser("target")
-    target_subparsers = target_parser.add_subparsers(dest="subcommand")
-    target_subparsers.add_parser("create", help="Create a target")
-    target_subparsers.add_parser("import", help="Import targets from a file")
-    target_subparsers.add_parser("list", help="List all targets")
-    target_subparsers.add_parser("clear", help="Delete all targets")
-
-    group_parser = subparsers.add_parser("group")
-    group_subparsers = group_parser.add_subparsers(dest="subcommand")
-    group_subparsers.add_parser("create", help="Create a group")
-    group_subparsers.add_parser("list", help="List all groups")
-    group_subparsers.add_parser("clear", help="Delete all groups")
-
-    template_parser = subparsers.add_parser("template")
-    template_subparsers = template_parser.add_subparsers(dest="subcommand")
-    template_subparsers.add_parser("create", help="Create a template")
-    template_subparsers.add_parser("list", help="List all templates")
-
-    execution_parser = subparsers.add_parser("execution")
-    execution_subparsers = execution_parser.add_subparsers(dest="subcommand")
-    execution_subparsers.add_parser("run", help="Run an execution")
-    execution_subparsers.add_parser("schedule", help="Schedule an execution")
-    execution_subparsers.add_parser("list", help="List all pending executions")
-
-    attachment_parser = subparsers.add_parser("attachment")
-    attachment_subparsers = attachment_parser.add_subparsers(dest="subcommand")
-    attachment_subparsers.add_parser("create", help="Create an attachment")
-    attachment_subparsers.add_parser("list", help="List all attachments")
-
-    phishing_email_parser = subparsers.add_parser("phishing-email")
-    phishing_email_subparsers = phishing_email_parser.add_subparsers(dest="subcommand")
-    phishing_email_subparsers.add_parser("send", help="Send a phishing email")
-    phishing_email_subparsers.add_parser("list", help="List all phishing emails")
+    Target.add_subparser(subparsers)
+    Group.add_subparser(subparsers)
+    PhishingEmailTemplate.add_subparser(subparsers)
+    Execution.add_subparser(subparsers)
+    Attachment.add_subparser(subparsers)
+    PhishingEmail.add_subparser(subparsers)
 
     args = parser.parse_args()
     match args.command:
