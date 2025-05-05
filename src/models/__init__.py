@@ -17,9 +17,8 @@ db = PostgresqlExtDatabase(
 )
 
 from .base import BaseModel
-from .target import Target
+from .target import Target, TargetGroup
 from .group import Group
-from .target_group import TargetGroup
 from .phishing_email_template import PhishingEmailTemplate
 from .execution import Execution
 from .attachment import Attachment

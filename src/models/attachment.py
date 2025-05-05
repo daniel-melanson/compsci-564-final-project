@@ -1,7 +1,7 @@
 from models.base import BaseModel
 import uuid
 import questionary
-from playhouse.postgres_ext import CharField
+from playhouse.postgres_ext import *
 from tabulate import tabulate
 
 

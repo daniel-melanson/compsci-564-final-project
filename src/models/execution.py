@@ -1,11 +1,11 @@
 from models.base import BaseModel
 from models.target import Target, validate_target_id
 from models.group import Group
-from playhouse.postgres_ext import AutoField, CharField, ForeignKeyField
+from playhouse.postgres_ext import *
 import questionary
 import re
 from datetime import datetime
-import tabulate
+from tabulate import tabulate
 
 
 def validate_date(date):
@@ -51,7 +51,7 @@ class Execution(BaseModel):
 
     @classmethod
     def prompt(cls):
-        return {
+        return [
             {
                 "type": "select",
                 "name": "single_or_group",
@@ -90,7 +90,7 @@ class Execution(BaseModel):
                 "message": "Enter script path",
                 "when": lambda answers: answers["command_or_script"] == "script",
             },
-        }
+        ]
 
     @classmethod
     def prompt_and_run(cls):
@@ -104,15 +104,15 @@ class Execution(BaseModel):
 
         for target in targets:
             if answers["command_or_script"] == "command":
-                task = execute_command.delay(target, answers["command"])
+                pass
             else:
-                task = execute_script.delay(target, answers["script"])
+                pass
 
-            cls.create(target=target, status="pending", celery_task_id=task.id)
+            cls.create(target=target, status="pending")
 
     @classmethod
     def prompt_and_schedule(cls):
-        questions = cls.prompt() | {
+        questions = cls.prompt() + [
             {
                 "type": "confirmation",
                 "name": "repeat",
@@ -145,6 +145,6 @@ class Execution(BaseModel):
                 "default": None,
                 "when": lambda answers: answers["random_offset"],
             },
-        }
+        ]
 
         answers = questionary.prompt(questions)

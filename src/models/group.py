@@ -1,7 +1,8 @@
 from models.base import BaseModel
-from playhouse.postgres_ext import AutoField, CharField
+from playhouse.postgres_ext import *
 import questionary
-import tabulate
+from tabulate import tabulate
+import re
 
 
 def validate_group_name(name):

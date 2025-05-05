@@ -2,14 +2,13 @@ from models.base import BaseModel
 from models.target import Target, validate_target_id
 from models.phishing_email_template import PhishingEmailTemplate
 from models.attachment import Attachment
+from models.group import Group
 import uuid
 import questionary
-from playhouse.postgres_ext import (
-    AutoField,
-    CharField,
-    ForeignKeyField,
-    ManyToManyField,
-)
+from playhouse.postgres_ext import *
+from tabulate import tabulate
+
+from tasks import send_phishing_email
 
 
 class PhishingEmail(BaseModel):
@@ -29,6 +28,15 @@ class PhishingEmail(BaseModel):
         return f"PhishingEmail[{self.id}] (subject='{self.subject}')"
 
     @classmethod
+    def clear(cls):
+        cls.delete().execute()
+
+    @classmethod
+    def list(cls):
+        query = cls.select().dicts()
+        print(tabulate(query, headers="keys", tablefmt="psql"))
+
+    @classmethod
     def add_subparser(cls, subparsers):
         parser = subparsers.add_parser("phishing-email", help="Manage phishing emails")
         parser.add_argument("subcommand", choices=["send", "list", "clear"])
@@ -36,7 +44,7 @@ class PhishingEmail(BaseModel):
     @classmethod
     def prompt_and_create(cls):
         result = questionary.prompt(
-            {
+            [
                 {
                     "type": "select",
                     "name": "single_or_group",
@@ -69,8 +77,8 @@ class PhishingEmail(BaseModel):
                     "message": "Select attachment",
                     "choices": Attachment.choices(),
                 },
-            }
-        ).ask()
+            ]
+        )
 
         if result["single_or_group"] == "single":
             targets = [Target.get(id=int(result["target_id"]))]
@@ -78,7 +86,7 @@ class PhishingEmail(BaseModel):
             targets = Target.select_in_groups(result["target_groups"])
 
         template = PhishingEmailTemplate.get(id=int(result["template"]))
-        attachments = Attachment.select_in(result["attachments"])
+        attachments = Attachment.select().where(Attachment.id << result["attachments"])
 
         for target in targets:
             phishing_email = cls.create(

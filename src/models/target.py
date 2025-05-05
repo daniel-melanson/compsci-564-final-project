@@ -1,20 +1,13 @@
 from models import db
 from models.base import BaseModel
 from models.group import Group
-from models.targetgroup import TargetGroup
-from playhouse.postgres_ext import (
-    AutoField,
-    CharField,
-    JSONField,
-    BooleanField,
-    fn,
-    JOIN,
-)
+from playhouse.postgres_ext import *
 import questionary
-import tabulate
+from tabulate import tabulate
 import csv
 import json
 import re
+import hashlib
 
 
 def get_fingerprint(email):
@@ -106,10 +99,10 @@ class Target(BaseModel):
 
         def process_row(row):
             email, data, groups_raw = row
-            if validate_email(email) != True:
+            if validate_target_email(email) != True:
                 raise Exception(f"Invalid email: {email}")
 
-            if validate_data(data) != True:
+            if validate_target_email(data) != True:
                 raise Exception(f"Invalid data: {data}")
 
             target = cls.create(
@@ -175,3 +168,11 @@ class Target(BaseModel):
 
         questionary.print(f"Created {target}")
         return target
+
+
+class TargetGroup(BaseModel):
+    group = ForeignKeyField(Group, on_delete="CASCADE", related_name="targets")
+    target = ForeignKeyField(Target, on_delete="CASCADE", related_name="groups")
+
+    class Meta:
+        unique_together = ("group", "target")

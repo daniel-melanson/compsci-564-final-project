@@ -79,19 +79,19 @@ def main():
                 case "schedule":
                     Execution.prompt_and_schedule()
                 case "list":
-                    pass
+                    Execution.list()
         case "attachment":
             match args.subcommand:
                 case "create":
                     Attachment.prompt_and_create()
                 case "list":
-                    pass
+                    Attachment.list()
         case "phishing-email":
             match args.subcommand:
                 case "send":
                     PhishingEmail.prompt_and_send()
                 case "list":
-                    pass
+                    PhishingEmail.list()
 
 
 if __name__ == "__main__":

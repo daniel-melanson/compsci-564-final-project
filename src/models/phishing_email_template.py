@@ -3,7 +3,8 @@ import os
 import shutil
 import uuid
 import questionary
-from playhouse.postgres_ext import CharField
+from playhouse.postgres_ext import *
+from tabulate import tabulate
 
 
 def validate_template_name(name):
