@@ -85,11 +85,14 @@ class Target(BaseModel):
         print(tabulate(query, headers="keys", tablefmt="psql"))
 
     @classmethod
+    def choices(cls):
+        return [questionary.Choice(target.email, target.id) for target in cls.select()]
+
+    @classmethod
     def select_in_groups(cls, group_ids):
         return (
             cls.select()
-            .distinct()
-            .join(TargetGroup)
+            .join(TargetGroup, on=(TargetGroup.target_id == cls.id))
             .where(TargetGroup.group_id << group_ids)
         )
 

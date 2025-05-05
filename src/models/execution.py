@@ -1,4 +1,5 @@
 from models.base import BaseModel
+import os
 from models.target import Target, validate_target_id
 from models.group import Group
 from playhouse.postgres_ext import *
@@ -32,9 +33,11 @@ def validate_duration(duration):
 
 class Execution(BaseModel):
     id = AutoField(primary_key=True)
-    celery_task_id = CharField(unique=True)
     target = ForeignKeyField(Target, on_delete="CASCADE", related_name="executions")
     status = CharField()
+    command = TextField()
+    run_at = DateTimeField()
+    result = TextField(null=True)
 
     def __str__(self):
         return f"Execution[{self.id}] (target={self.target}, status={self.status})"
@@ -55,21 +58,27 @@ class Execution(BaseModel):
             {
                 "type": "select",
                 "name": "single_or_group",
-                "message": "Execute against a single target or a group?",
-                "choices": ["single", "group"],
+                "message": "Execute against a specific target or a group?",
+                "choices": ["specific", "group"],
             },
             {
-                "type": "text",
-                "name": "target_id",
-                "message": "Enter target ID",
-                "validate": validate_target_id,
-                "when": lambda answers: answers["single_or_group"] == "single",
+                "type": "checkbox",
+                "name": "target_ids",
+                "message": "Select target(s)",
+                "choices": Target.choices(),
+                "validate": lambda targets: (
+                    True if len(targets) > 0 else "Please select at least one target"
+                ),
+                "when": lambda answers: answers["single_or_group"] == "specific",
             },
             {
                 "type": "checkbox",
                 "name": "target_groups",
                 "message": "Select target group(s)",
                 "choices": Group.choices(),
+                "validate": lambda groups: (
+                    True if len(groups) > 0 else "Please select at least one group"
+                ),
                 "when": lambda answers: answers["single_or_group"] == "group",
             },
             {
@@ -88,6 +97,13 @@ class Execution(BaseModel):
                 "type": "path",
                 "name": "script",
                 "message": "Enter script path",
+                "validate": lambda script: (
+                    True
+                    if os.path.exists(script)
+                    and os.path.isfile(script)
+                    and os.access(script, os.R_OK)
+                    else "Script does not exist or is not readable"
+                ),
                 "when": lambda answers: answers["command_or_script"] == "script",
             },
         ]
@@ -96,19 +112,26 @@ class Execution(BaseModel):
     def prompt_and_run(cls):
         answers = questionary.prompt(cls.prompt())
 
-        if answers["single_or_group"] == "single":
-            targets = [Target.get(id=int(answers["target_id"]))]
+        if answers["single_or_group"] == "specific":
+            targets = Target.select().where(Target.id << answers["target_ids"])
         else:
-            group_ids = [g.value for g in answers["target_groups"]]
-            targets = Target.select_in_groups(group_ids)
+            assert answers["target_groups"] and len(answers["target_groups"]) > 0
+            targets = Target.select_in_groups(answers["target_groups"])
+
+        if answers["command_or_script"] == "script":
+            with open(answers["script"], "r") as f:
+                command = f.read()
+        else:
+            command = answers["command"]
 
         for target in targets:
-            if answers["command_or_script"] == "command":
-                pass
-            else:
-                pass
-
-            cls.create(target=target, status="pending")
+            execution = cls.create(
+                target=target,
+                status="pending",
+                command=command,
+                run_at=datetime.now(),
+            )
+            questionary.print(f"Created {execution}")
 
     @classmethod
     def prompt_and_schedule(cls):
