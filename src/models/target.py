@@ -1,3 +1,4 @@
+from datetime import datetime
 from models import db
 from models.base import BaseModel
 from models.group import Group
@@ -52,6 +53,7 @@ class Target(BaseModel):
     id = AutoField(primary_key=True)
     fingerprint = CharField(unique=True)
     email = CharField(unique=True)
+    created_at = DateTimeField(default=lambda: datetime.now())
     data = JSONField(default={})
     active = BooleanField(default=False)
 
@@ -73,6 +75,7 @@ class Target(BaseModel):
             cls.select(
                 cls.id,
                 cls.email,
+                cls.created_at,
                 cls.data,
                 cls.active,
                 fn.STRING_AGG(Group.name, ",").alias("groups"),

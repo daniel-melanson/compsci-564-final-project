@@ -3,7 +3,7 @@ import uuid
 import questionary
 from playhouse.postgres_ext import *
 from tabulate import tabulate
-
+from datetime import datetime
 
 def validate_attachment_name(name):
     name = name.strip()
@@ -21,6 +21,7 @@ class Attachment(BaseModel):
     id = CharField(primary_key=True, max_length=8)
     name = CharField()
     path = CharField(unique=True)
+    created_at = DateTimeField(default=lambda: datetime.now())
 
     def __str__(self):
         return f"Attachment[{self.id}] (name='{self.name}')"

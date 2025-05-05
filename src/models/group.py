@@ -2,6 +2,7 @@ from models.base import BaseModel
 from playhouse.postgres_ext import *
 import questionary
 from tabulate import tabulate
+from datetime import datetime
 import re
 
 
@@ -22,6 +23,7 @@ def validate_group_name(name):
 class Group(BaseModel):
     id = AutoField(primary_key=True)
     name = CharField(unique=True)
+    created_at = DateTimeField(default=lambda: datetime.now())
 
     def __str__(self):
         return f"Group[{self.id}] (name={self.name})"

@@ -4,6 +4,7 @@ import os
 import shutil
 import uuid
 import questionary
+from datetime import datetime
 from playhouse.postgres_ext import *
 from tabulate import tabulate
 
@@ -40,6 +41,7 @@ class PhishingEmailTemplate(BaseModel):
     id = CharField(primary_key=True, max_length=8)
     name = CharField(unique=True)
     subject = CharField()
+    created_at = DateTimeField(default=lambda: datetime.now())
     path = CharField(unique=True)
 
     def __str__(self):

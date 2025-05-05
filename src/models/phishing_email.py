@@ -1,3 +1,4 @@
+from datetime import datetime
 from models.base import BaseModel
 from models.target import Target, validate_target_id
 from models.phishing_email_template import PhishingEmailTemplate
@@ -20,8 +21,10 @@ class PhishingEmail(BaseModel):
     template = ForeignKeyField(
         PhishingEmailTemplate, on_delete="CASCADE", related_name="phishing_emails"
     )
+    created_at = DateTimeField(default=lambda: datetime.now())
     attachments = ManyToManyField(Attachment, backref="phishing_emails")
     celery_task_id = CharField(unique=True)
+    sent_at = DateTimeField(null=True)
     status = CharField()
 
     def __str__(self):
