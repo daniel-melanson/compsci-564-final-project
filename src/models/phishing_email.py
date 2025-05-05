@@ -1,5 +1,5 @@
 from models.base import BaseModel
-from models.target import Target
+from models.target import Target, validate_target_id
 from models.phishing_email_template import PhishingEmailTemplate
 from models.attachment import Attachment
 import uuid

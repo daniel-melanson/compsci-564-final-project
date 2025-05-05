@@ -13,6 +13,7 @@ services:
       - redis
       - metabase
     volumes:
+      - ${PWD}/src:/usr/src/c2-server/src
       - ${PWD}/templates:/usr/src/c2-server/templates
       - ${PWD}/attachments:/usr/src/c2-server/attachments
       - ${PWD}/implants:/usr/src/c2-server/implants
@@ -24,7 +25,7 @@ services:
     build: .
     command: ./.venv/bin/celery -A src.tasks worker -l info
     volumes:
-      - .:/code
+      - ${PWD}/src:/usr/src/c2-server/src
     depends_on:
       - db
       - redis

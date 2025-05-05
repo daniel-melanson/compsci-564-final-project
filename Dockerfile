@@ -25,5 +25,3 @@ COPY --from=builder ${PROJECT_DIR}/.venv/ ${PROJECT_DIR}/.venv/
 RUN ${PROJECT_DIR}/.venv/bin/python -c "import celery; print(celery.__version__)"
 
 WORKDIR ${PROJECT_DIR}
-
-COPY ./src ${PROJECT_DIR}/src
