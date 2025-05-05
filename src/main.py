@@ -37,13 +37,13 @@ def main():
     target_subparsers.add_parser("create", help="Create a target")
     target_subparsers.add_parser("import", help="Import targets from a file")
     target_subparsers.add_parser("list", help="List all targets")
-    target_subparsers.add_parser("delete", help="Delete all targets")
+    target_subparsers.add_parser("clear", help="Delete all targets")
 
     group_parser = subparsers.add_parser("group")
     group_subparsers = group_parser.add_subparsers(dest="subcommand")
     group_subparsers.add_parser("create", help="Create a group")
     group_subparsers.add_parser("list", help="List all groups")
-    group_subparsers.add_parser("delete", help="Delete all groups")
+    group_subparsers.add_parser("clear", help="Delete all groups")
 
     template_parser = subparsers.add_parser("template")
     template_subparsers = template_parser.add_subparsers(dest="subcommand")
@@ -76,8 +76,10 @@ def main():
                     Target.import_from_csv()
                 case "list":
                     Target.list()
-                case "delete":
-                    if questionary.confirm("Are you sure you want to delete all targets?").ask():
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all targets?"
+                    ).ask():
                         Target.delete().execute()
         case "group":
             match args.subcommand:
@@ -85,8 +87,10 @@ def main():
                     Group.prompt_and_create()
                 case "list":
                     Group.list()
-                case "delete":
-                    if questionary.confirm("Are you sure you want to delete all groups?").ask():
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all groups?"
+                    ).ask():
                         Group.delete().execute()
         case "template":
             match args.subcommand:
