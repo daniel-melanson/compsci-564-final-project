@@ -1,38 +1,66 @@
 import argparse
 from models import db
-from models import Target, TargetGroup, Implant, Template, Execution
+from models import (
+    Target,
+    Group,
+    TargetGroup,
+    PhishingEmailTemplate,
+    Execution,
+    Attachment,
+    PhishingEmail,
+)
 
 
 def main():
     with db:
-        db.create_tables([Target, TargetGroup, Implant, Template, Execution], safe=True)
-
+        db.create_tables(
+            [
+                Target,
+                Group,
+                TargetGroup,
+                PhishingEmailTemplate,
+                Execution,
+                Attachment,
+                PhishingEmail,
+            ],
+            safe=True,
+        )
 
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(dest="command")
 
     target_parser = subparsers.add_parser("target")
-    target_parser.add_argument("create", help="Create a target")
-    target_parser.add_argument("import", help="Import targets from a file")
-    target_parser.add_argument("list", help="List all targets")
+    target_subparsers = target_parser.add_subparsers(dest="subcommand")
+    target_subparsers.add_parser("create", help="Create a target")
+    target_subparsers.add_parser("import", help="Import targets from a file")
+    target_subparsers.add_parser("list", help="List all targets")
 
-    target_group_parser = subparsers.add_parser("target-group")
-    target_group_parser.add_argument("create", help="Create a target group")
-    target_group_parser.add_argument("list", help="List all target groups")
-
-    implant_parser = subparsers.add_parser("implant")
-    implant_parser.add_argument("create", help="Create an implant")
-    implant_parser.add_argument("list", help="List all implants")
+    group_parser = subparsers.add_parser("group")
+    group_subparsers = group_parser.add_subparsers(dest="subcommand")
+    group_subparsers.add_parser("create", help="Create a group")
+    group_subparsers.add_parser("list", help="List all groups")
 
     template_parser = subparsers.add_parser("template")
-    template_parser.add_argument("create", help="Create a template")
-    template_parser.add_argument("list", help="List all templates")
+    template_subparsers = template_parser.add_subparsers(dest="subcommand")
+    template_subparsers.add_parser("create", help="Create a template")
+    template_subparsers.add_parser("list", help="List all templates")
 
     execution_parser = subparsers.add_parser("execution")
-    execution_parser.add_argument("run", help="Run an execution")
-    execution_parser.add_argument("schedule", help="Schedule an execution")
-    execution_parser.add_argument("list", help="List all pending executions")
+    execution_subparsers = execution_parser.add_subparsers(dest="subcommand")
+    execution_subparsers.add_parser("run", help="Run an execution")
+    execution_subparsers.add_parser("schedule", help="Schedule an execution")
+    execution_subparsers.add_parser("list", help="List all pending executions")
+
+    attachment_parser = subparsers.add_parser("attachment")
+    attachment_subparsers = attachment_parser.add_subparsers(dest="subcommand")
+    attachment_subparsers.add_parser("create", help="Create an attachment")
+    attachment_subparsers.add_parser("list", help="List all attachments")
+
+    phishing_email_parser = subparsers.add_parser("phishing-email")
+    phishing_email_subparsers = phishing_email_parser.add_subparsers(dest="subcommand")
+    phishing_email_subparsers.add_parser("send", help="Send a phishing email")
+    phishing_email_subparsers.add_parser("list", help="List all phishing emails")
 
     args = parser.parse_args()
     match args.command:
@@ -43,31 +71,37 @@ def main():
                 case "import":
                     Target.import_from_csv()
                 case "list":
-                    pass
-        case "target-group":
+                    Target.list()
+        case "group":
             match args.subcommand:
                 case "create":
-                    TargetGroup.prompt_and_create()
+                    Group.prompt_and_create()
                 case "list":
-                    pass
-        case "implant":
-            match args.subcommand:
-                case "create":
-                    Implant.prompt_and_create()
-                case "list":
-                    pass
+                    Group.list()
         case "template":
             match args.subcommand:
                 case "create":
-                    Template.prompt_and_create()
+                    PhishingEmailTemplate.prompt_and_create()
                 case "list":
-                    pass
+                    PhishingEmailTemplate.list()
         case "execution":
             match args.subcommand:
                 case "run":
                     Execution.prompt_and_run()
                 case "schedule":
                     Execution.prompt_and_schedule()
+                case "list":
+                    pass
+        case "attachment":
+            match args.subcommand:
+                case "create":
+                    Attachment.prompt_and_create()
+                case "list":
+                    pass
+        case "phishing-email":
+            match args.subcommand:
+                case "send":
+                    PhishingEmail.prompt_and_send()
                 case "list":
                     pass
 
