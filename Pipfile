@@ -9,6 +9,7 @@ celery = {extras = ["redis"], version = "*"}
 psycopg2-binary = "*"
 questionary = "*"
 tabulate = "*"
+faker = "*"
 
 [dev-packages]
 

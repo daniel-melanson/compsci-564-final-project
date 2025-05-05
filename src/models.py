@@ -8,6 +8,7 @@ import hashlib
 import questionary
 import psycopg2
 from tabulate import tabulate
+import csv
 
 
 conn = psycopg2.connect(
@@ -70,37 +71,35 @@ class Target(BaseModel):
     @classmethod
     def import_from_csv(cls):
         file_path = questionary.path("Enter file path").ask()
-        users = []
 
         def process_row(row):
-            email = row[0].strip().lower()
-            try:
-                validate_email(email)
-            except questionary.ValidationError:
-                questionary.print(f"Invalid email: {email}")
-                return
+            email, data, groups_raw = row
+            if validate_email(email) != True:
+                raise Exception(f"Invalid email: {email}")
 
-            data = row[1].strip() or "{}"
-            try:
-                validate_data(data)
-            except questionary.ValidationError:
-                questionary.print(f"Invalid data: {data}")
-                return
+            if validate_data(data) != True:
+                raise Exception(f"Invalid data: {data}")
 
-            users.append(
-                cls(
-                    email=email,
-                    data=data,
-                    fingerprint=hashlib.sha256(email.encode()).hexdigest(),
-                )
+            target = cls.create(
+                email=email,
+                data=json.loads(data),
+                fingerprint=get_fingerprint(email),
             )
 
-        with open(file_path, "r") as f:
-            for row in csv.reader(f):
-                process_row(row)
+            groups = groups_raw.split(",")
+            for group_name in groups:
+                group, _ = Group.get_or_create(name=group_name.strip())
+                TargetGroup.create(target=target, group=group)
 
-        cls.bulk_create(users)
-        questionary.print(f"Imported {len(users)} targets")
+        count = 0
+        with db.transaction():
+            with open(file_path, "r") as f:
+                next(f)  # Skip header
+                for row in csv.reader(f):
+                    process_row(row)
+                    count += 1
+
+        questionary.print(f"Imported {count} targets")
 
     @classmethod
     def prompt_and_create(cls):
@@ -133,7 +132,7 @@ class Target(BaseModel):
         target = cls.create(
             email=answers["email"].strip().lower(),
             data=answers["data"],
-            fingerprint=hashlib.sha256(answers["email"].encode()).hexdigest(),
+            fingerprint=get_fingerprint(answers["email"]),
         )
 
         for group_id in answers.get("groups", []):
@@ -545,7 +544,13 @@ def validate_group_name(name):
         return "Target group name must be at least 3 characters long"
     elif len(name) > 100:
         return "Target group name cannot be longer than 100 characters"
+    elif not re.match(r"^[\w ]+$", name):
+        return "Target group name can only contain letters, numbers, and spaces"
     elif Group.select().where(Group.name == name).exists():
         return "Target group name already exists"
     else:
         return True
+
+
+def get_fingerprint(email):
+    return hashlib.sha256(email.encode()).hexdigest()
