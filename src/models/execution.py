@@ -70,6 +70,10 @@ class Execution(BaseModel):
         print(tabulate(query, headers="keys", tablefmt="psql"))
 
     @classmethod
+    def clear(cls):
+        cls.delete().execute()
+
+    @classmethod
     def add_subparser(cls, subparsers):
         parser = subparsers.add_parser("execution", help="Manage executions")
         parser.add_argument("subcommand", choices=["run", "schedule", "list", "clear"])

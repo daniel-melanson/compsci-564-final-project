@@ -1,4 +1,5 @@
 from models.base import BaseModel
+import os
 import uuid
 import questionary
 from playhouse.postgres_ext import *
@@ -25,6 +26,12 @@ class Attachment(BaseModel):
 
     def __str__(self):
         return f"Attachment[{self.id}] (name='{self.name}')"
+
+    @classmethod
+    def clear(cls):
+        for attachment in cls.select():
+            os.remove(attachment.path)
+        cls.delete().execute()
 
     @classmethod
     def add_subparser(cls, subparsers):

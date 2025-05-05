@@ -53,7 +53,7 @@ def main():
                     if questionary.confirm(
                         "Are you sure you want to delete all targets?"
                     ).ask():
-                        Target.delete().execute()
+                        Target.clear()
         case "group":
             match args.subcommand:
                 case "create":
@@ -64,7 +64,7 @@ def main():
                     if questionary.confirm(
                         "Are you sure you want to delete all groups?"
                     ).ask():
-                        Group.delete().execute()
+                        Group.clear()
         case "template":
             match args.subcommand:
                 case "create":
@@ -75,7 +75,7 @@ def main():
                     if questionary.confirm(
                         "Are you sure you want to delete all templates?"
                     ).ask():
-                        PhishingEmailTemplate.delete().execute()
+                        PhishingEmailTemplate.clear()
         case "execution":
             match args.subcommand:
                 case "run":
@@ -84,12 +84,22 @@ def main():
                     Execution.prompt_and_schedule()
                 case "list":
                     Execution.list()
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all executions?"
+                    ).ask():
+                        Execution.clear()
         case "attachment":
             match args.subcommand:
                 case "create":
                     Attachment.prompt_and_create()
                 case "list":
                     Attachment.list()
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all attachments?"
+                    ).ask():
+                        Attachment.clear()
         case "phishing-email":
             match args.subcommand:
                 case "send":

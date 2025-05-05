@@ -34,6 +34,10 @@ class Group(BaseModel):
         parser.add_argument("subcommand", choices=["create", "list", "clear"])
 
     @classmethod
+    def clear(cls):
+        cls.delete().execute()
+
+    @classmethod
     def list(cls):
         query = cls.select().dicts()
         print(tabulate(query, headers="keys", tablefmt="psql"))
