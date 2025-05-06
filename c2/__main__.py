@@ -2,26 +2,13 @@ import argparse
 
 import questionary
 
-from c2.models import (
-    Attachment,
-    Execution,
-    Group,
-    PhishingEmail,
-    PhishingEmailTemplate,
-    Target,
-    TargetGroup,
-    db,
-)
+from c2.models import (Attachment, Execution, Group, PhishingEmail,
+                       PhishingEmailTemplate, Target, TargetGroup, db)
 from c2.models.email_account import EmailAccount
-from c2.prompts import (
-    import_targets_from_csv,
-    prompt_attachment,
-    prompt_email_account,
-    prompt_group,
-    prompt_phishing_email,
-    prompt_phishing_email_template,
-    prompt_target,
-)
+from c2.prompts import (import_targets_from_csv, prompt_attachment,
+                        prompt_email_account, prompt_group,
+                        prompt_phishing_email, prompt_phishing_email_template,
+                        prompt_target)
 
 
 def main():

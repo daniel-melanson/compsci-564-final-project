@@ -1,13 +1,13 @@
 import logging
+import smtplib
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 import jinja2
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-
-from c2.models import db, PhishingEmail
 from celery import Celery
+
+from c2.models import PhishingEmail, db
 
 app = Celery("c2")
 

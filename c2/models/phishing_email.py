@@ -3,8 +3,8 @@ from datetime import datetime
 from playhouse.postgres_ext import *
 from tabulate import tabulate
 
-from .base import BaseModel
 from .attachment import Attachment
+from .base import BaseModel
 from .email_account import EmailAccount
 from .phishing_email_template import PhishingEmailTemplate
 from .target import Target

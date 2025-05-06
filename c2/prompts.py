@@ -6,24 +6,18 @@ import shutil
 import uuid
 
 import questionary
+
+from c2.models import db
 from c2.models.attachment import Attachment, validate_attachment_name
 from c2.models.email_account import EmailAccount, validate_email_account_name
 from c2.models.group import Group, validate_group_name
 from c2.models.phishing_email import PhishingEmail
-from c2.models.phishing_email_template import (
-    PhishingEmailTemplate,
-    validate_template_name,
-    validate_template_subject,
-)
-from c2.models.target import (
-    Target,
-    TargetGroup,
-    get_fingerprint,
-    validate_target_data,
-    validate_target_email,
-)
+from c2.models.phishing_email_template import (PhishingEmailTemplate,
+                                               validate_template_name,
+                                               validate_template_subject)
+from c2.models.target import (Target, TargetGroup, get_fingerprint,
+                              validate_target_data, validate_target_email)
 from c2.tasks import send_phishing_email
-from c2.models import db
 
 
 def prompt_group():

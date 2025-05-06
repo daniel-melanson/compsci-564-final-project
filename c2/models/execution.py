@@ -8,8 +8,8 @@ from playhouse.postgres_ext import *
 from tabulate import tabulate
 
 from .base import BaseModel
-from .target import Target
 from .group import Group
+from .target import Target
 
 
 def validate_date(date):

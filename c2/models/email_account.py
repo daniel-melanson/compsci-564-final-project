@@ -1,7 +1,8 @@
-from playhouse.postgres_ext import *
 import questionary
-from .base import BaseModel
+from playhouse.postgres_ext import *
 from tabulate import tabulate
+
+from .base import BaseModel
 
 
 def validate_email_account_name(name: str):
