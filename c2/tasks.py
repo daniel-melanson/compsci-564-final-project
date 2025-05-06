@@ -1,9 +1,13 @@
-from celery import Celery
-import jinja2
 import logging
+
+import jinja2
+from celery import Celery
+
 from models.phishing_email import PhishingEmail
 
-celery = Celery("c2_server", broker="redis://redis:6379/0", backend="redis://redis:6379/0")
+celery = Celery(
+    "c2_server", broker="redis://redis:6379/0", backend="redis://redis:6379/0"
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,3 +28,5 @@ def send_phishing_email(phishing_email_id: int):
 
     logger.info(subject)
     logger.info(body)
+
+    logger.info("send_phishing_email")

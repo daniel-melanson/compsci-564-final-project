@@ -1,5 +1,5 @@
-from playhouse.postgres_ext import *
 import psycopg2
+from playhouse.postgres_ext import *
 
 conn = psycopg2.connect(
     host="db", user="postgres", password="postgres", database="postgres"
@@ -16,13 +16,13 @@ db = PostgresqlExtDatabase(
     "c2_server", user="postgres", password="postgres", host="db", port=5432
 )
 
-from .base import BaseModel
-from .target import Target, TargetGroup
-from .group import Group
-from .phishing_email_template import PhishingEmailTemplate
-from .execution import Execution
 from .attachment import Attachment
+from .base import BaseModel
+from .execution import Execution
+from .group import Group
 from .phishing_email import PhishingEmail
+from .phishing_email_template import PhishingEmailTemplate
+from .target import Target, TargetGroup
 
 __all__ = [
     "db",

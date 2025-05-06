@@ -1,9 +1,11 @@
-from models.base import BaseModel
-from playhouse.postgres_ext import *
-import questionary
-from tabulate import tabulate
-from datetime import datetime
 import re
+from datetime import datetime
+
+import questionary
+from playhouse.postgres_ext import *
+from tabulate import tabulate
+
+from .base import BaseModel
 
 
 def validate_group_name(name):
@@ -48,14 +50,3 @@ class Group(BaseModel):
             questionary.Choice(target_group.name, target_group.id)
             for target_group in cls.select()
         ]
-
-    @classmethod
-    def prompt_and_create(cls):
-        name = questionary.text(
-            "Enter target group name", validate=validate_group_name
-        ).ask()
-        assert name.strip()
-
-        group = cls.create(name=name.strip())
-        questionary.print(f"Created {group}")
-        return group

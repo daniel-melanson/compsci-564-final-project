@@ -1,12 +1,14 @@
-from models.base import BaseModel
-import re
 import os
+import re
 import shutil
 import uuid
-import questionary
 from datetime import datetime
+
+import questionary
 from playhouse.postgres_ext import *
 from tabulate import tabulate
+
+from .base import BaseModel
 
 
 def validate_template_name(name):
@@ -69,28 +71,3 @@ class PhishingEmailTemplate(BaseModel):
         return [
             questionary.Choice(template.name, template.id) for template in cls.select()
         ]
-
-    @classmethod
-    def prompt_and_create(cls):
-        id = uuid.uuid4().hex[:8]
-        name = questionary.text(
-            "Enter template name",
-            validate=validate_template_name,
-        ).ask()
-        assert name.strip()
-        subject = questionary.text(
-            "Enter template subject (as seen by the target; supports Jinja)",
-            validate=validate_template_subject,
-        ).ask()
-        assert subject.strip()
-
-        template = cls.create(
-            id=id,
-            name=name.strip(),
-            subject=subject.strip(),
-            path=f"templates/{id}_{name.strip().lower().replace(' ', '_')}.html",
-        )
-        shutil.copyfile("templates/default.html", template.path)
-        questionary.print(f"Created {template}")
-        questionary.print(f"Write template contents to: {template.path}")
-        return template

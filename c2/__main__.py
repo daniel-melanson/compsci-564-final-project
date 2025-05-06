@@ -1,20 +1,30 @@
 import argparse
 
 import questionary
-from models import db
+
 from models import (
-    Target,
-    Group,
-    TargetGroup,
-    PhishingEmailTemplate,
-    Execution,
     Attachment,
+    Execution,
+    Group,
     PhishingEmail,
+    PhishingEmailTemplate,
+    Target,
+    TargetGroup,
+    db,
+)
+from prompts import (
+    import_targets_from_csv,
+    prompt_attachment,
+    prompt_group,
+    prompt_phishing_email,
+    prompt_phishing_email_template,
+    prompt_target,
 )
 
 
 def main():
     with db:
+        db.drop_tables([PhishingEmail])
         db.create_tables(
             [
                 Target,
@@ -44,9 +54,9 @@ def main():
         case "target":
             match args.subcommand:
                 case "create":
-                    Target.prompt_and_create()
+                    prompt_target()
                 case "import":
-                    Target.import_from_csv()
+                    import_targets_from_csv()
                 case "list":
                     Target.list()
                 case "clear":
@@ -57,7 +67,7 @@ def main():
         case "group":
             match args.subcommand:
                 case "create":
-                    Group.prompt_and_create()
+                    prompt_group()
                 case "list":
                     Group.list()
                 case "clear":
@@ -68,7 +78,7 @@ def main():
         case "template":
             match args.subcommand:
                 case "create":
-                    PhishingEmailTemplate.prompt_and_create()
+                    prompt_phishing_email_template()
                 case "list":
                     PhishingEmailTemplate.list()
                 case "clear":
@@ -79,7 +89,7 @@ def main():
         case "execution":
             match args.subcommand:
                 case "run":
-                    Execution.prompt_and_run()
+                    prompt_email()
                 case "schedule":
                     Execution.prompt_and_schedule()
                 case "list":
@@ -92,7 +102,7 @@ def main():
         case "attachment":
             match args.subcommand:
                 case "create":
-                    Attachment.prompt_and_create()
+                    prompt_attachment()
                 case "list":
                     Attachment.list()
                 case "clear":
@@ -103,7 +113,7 @@ def main():
         case "phishing-email":
             match args.subcommand:
                 case "send":
-                    PhishingEmail.prompt_and_send()
+                    prompt_phishing_email()
                 case "list":
                     PhishingEmail.list()
 

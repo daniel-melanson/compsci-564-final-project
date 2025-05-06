@@ -3,17 +3,12 @@ services:
     build: .
     tty: true
     stdin_open: true
-    develop:
-      watch:
-        - action: sync
-          path: ./src
-          target: /usr/src/c2-server/src
     depends_on:
       - db
       - redis
       - metabase
     volumes:
-      - ${PWD}/src:/usr/src/c2-server/src
+      - ${PWD}/c2:/usr/src/c2-server/c2
       - ${PWD}/templates:/usr/src/c2-server/templates
       - ${PWD}/attachments:/usr/src/c2-server/attachments
       - ${PWD}/implants:/usr/src/c2-server/implants
@@ -23,9 +18,9 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
   worker:
     build: .
-    command: ./.venv/bin/celery -A src.tasks worker -l info
+    command: ./.venv/bin/celery -A c2.tasks worker -l info
     volumes:
-      - ${PWD}/src:/usr/src/c2-server/src
+      - ${PWD}/c2:/usr/src/c2-server/c2
     depends_on:
       - db
       - redis

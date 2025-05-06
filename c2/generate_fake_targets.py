@@ -1,7 +1,8 @@
-import faker
-import random
 import csv
 import json
+import random
+
+import faker
 
 fake = faker.Faker()
 

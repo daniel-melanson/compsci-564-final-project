@@ -1,13 +1,15 @@
-from models.base import BaseModel
 import os
-from models.target import Target
-from models.group import Group
-from playhouse.postgres_ext import *
-import questionary
+import random
 import re
 from datetime import datetime, timedelta
+
+import questionary
+from playhouse.postgres_ext import *
 from tabulate import tabulate
-import random
+
+from .base import BaseModel
+from .target import Target
+from .group import Group
 
 
 def validate_date(date):

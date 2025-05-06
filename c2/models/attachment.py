@@ -1,10 +1,13 @@
-from models.base import BaseModel
 import os
 import uuid
+from datetime import datetime
+
 import questionary
 from playhouse.postgres_ext import *
 from tabulate import tabulate
-from datetime import datetime
+
+from .base import BaseModel
+
 
 def validate_attachment_name(name):
     name = name.strip()
@@ -49,20 +52,3 @@ class Attachment(BaseModel):
             questionary.Choice(attachment.name, attachment.id)
             for attachment in cls.select()
         ]
-
-    @classmethod
-    def prompt_and_create(cls):
-        id = uuid.uuid4().hex[:8]
-        name = questionary.text(
-            "Enter the attachment name as seen by the target",
-            validate=validate_attachment_name,
-        ).ask()
-        attachment = cls.create(
-            id=id, name=name.strip(), path=f"attachments/{id}_{name.strip()}"
-        )
-        with open(attachment.path, "w") as f:
-            f.write("")
-
-        questionary.print(f"Created {attachment}")
-        questionary.print(f"Write attachment contents to: {attachment.path}")
-        return attachment

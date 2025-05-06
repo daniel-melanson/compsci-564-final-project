@@ -12,6 +12,7 @@ tabulate = "*"
 faker = "*"
 black = "*"
 jinja2 = "*"
+isort = "*"
 
 [dev-packages]
 
