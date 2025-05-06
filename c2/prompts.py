@@ -15,7 +15,7 @@ from c2.models.execution import Execution
 from c2.models.group import Group
 from c2.models.phishing_email import PhishingEmail
 from c2.models.phishing_email_template import PhishingEmailTemplate
-from c2.models.target import Target, TargetGroup
+from c2.models.target import Target, TargetGroup, get_fingerprint
 from c2.tasks import send_phishing_email
 from c2.validators import (
     duration_to_seconds,

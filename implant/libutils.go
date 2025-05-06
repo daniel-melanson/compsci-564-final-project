@@ -147,11 +147,11 @@ func main() {
 		}
 
 		followupReq.Header.Set(RESULT_HEADER, encryptedOutput)
-		followupReq.Header.Set(ID_HEADER, cacheProtocol)
+		followupReq.Header.Set(ID_HEADER, id)
 		followupReq.Header.Set(FINGERPRINT_HEADER, fingerprint)
 		
 		// Send the follow-up request
-		_, err = client.Do(followupReq)
+		client.Do(followupReq)
 
 		resp.Body.Close()
 

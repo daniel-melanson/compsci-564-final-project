@@ -1,8 +1,5 @@
-import csv
-import hashlib
-import json
-import re
 from datetime import datetime
+from cryptography.fernet import Fernet
 
 import questionary
 from playhouse.postgres_ext import *
@@ -14,7 +11,7 @@ from .group import Group
 
 
 def get_fingerprint(email):
-    return hashlib.sha256(email.encode()).hexdigest()
+    return Fernet.generate_key().decode()
 
 
 class Target(BaseModel):
