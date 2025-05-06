@@ -35,7 +35,7 @@ def rand_employee():
         "manager": fake.name(),
     }
 
-    email = f"{data['first_name'].lower()}.{data['last_name'].lower()}@not-actually-mitre.org"
+    email = f"{data['first_name'].lower()}.{data['last_name'].lower()}@mitre.org"
     groups = f"MITRE,MITRE_{data['department']}"
 
     return email, json.dumps(data), groups
