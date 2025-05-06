@@ -12,9 +12,11 @@ from c2.models import (
     TargetGroup,
     db,
 )
+from c2.models.email_account import EmailAccount
 from c2.prompts import (
     import_targets_from_csv,
     prompt_attachment,
+    prompt_email_account,
     prompt_group,
     prompt_phishing_email,
     prompt_phishing_email_template,
@@ -24,7 +26,6 @@ from c2.prompts import (
 
 def main():
     with db:
-        db.drop_tables([PhishingEmail])
         db.create_tables(
             [
                 Target,
@@ -34,6 +35,7 @@ def main():
                 Execution,
                 Attachment,
                 PhishingEmail,
+                EmailAccount,
             ],
             safe=True,
         )
@@ -48,6 +50,7 @@ def main():
     Execution.add_subparser(subparsers)
     Attachment.add_subparser(subparsers)
     PhishingEmail.add_subparser(subparsers)
+    EmailAccount.add_subparser(subparsers)
 
     args = parser.parse_args()
     match args.command:
@@ -121,6 +124,17 @@ def main():
                         "Are you sure you want to delete all phishing emails?"
                     ).ask():
                         PhishingEmail.clear()
+        case "email-account":
+            match args.subcommand:
+                case "create":
+                    prompt_email_account()
+                case "list":
+                    EmailAccount.list()
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all email accounts?"
+                    ).ask():
+                        EmailAccount.clear()
 
 
 if __name__ == "__main__":

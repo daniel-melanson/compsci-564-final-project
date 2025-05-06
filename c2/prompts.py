@@ -1,4 +1,5 @@
 import csv
+import email
 import json
 import os
 import shutil
@@ -6,6 +7,7 @@ import uuid
 
 import questionary
 from c2.models.attachment import Attachment, validate_attachment_name
+from c2.models.email_account import EmailAccount, validate_email_account_name
 from c2.models.group import Group, validate_group_name
 from c2.models.phishing_email import PhishingEmail
 from c2.models.phishing_email_template import (
@@ -60,6 +62,40 @@ def prompt_phishing_email_template():
     questionary.print(f"Created {template}")
     questionary.print(f"Write template contents to: {template.path}")
     return template
+
+
+def prompt_email_account():
+    name = questionary.text(
+        "Enter email account name",
+        validate=validate_email_account_name,
+    ).ask()
+    assert name.strip()
+    username = questionary.text(
+        "Enter email account username",
+    ).ask()
+    assert username.strip()
+    password = questionary.password(
+        "Enter email account password",
+    ).ask()
+    assert password.strip()
+    smtp_server = questionary.text(
+        "Enter email account SMTP server",
+    ).ask()
+    assert smtp_server.strip()
+    smtp_port = questionary.text(
+        "Enter email account SMTP port",
+    ).ask()
+    assert smtp_port.strip()
+
+    email_account = EmailAccount.create(
+        name=name.strip(),
+        username=username.strip(),
+        password=password.strip(),
+        smtp_server=smtp_server.strip(),
+        smtp_port=int(smtp_port.strip()),
+    )
+    questionary.print(f"Created {email_account}")
+    return email_account
 
 
 def import_targets_from_csv():
@@ -162,6 +198,12 @@ def prompt_phishing_email():
         raise ValueError("No targets found")
     if Group.select().count() == 0:
         raise ValueError("No groups found")
+    if EmailAccount.select().count() == 0:
+        raise ValueError("No email accounts found")
+    if PhishingEmailTemplate.select().count() == 0:
+        raise ValueError("No phishing email templates found")
+    if Attachment.select().count() == 0:
+        raise ValueError("No attachments found")
 
     answers = questionary.prompt(
         [
@@ -193,14 +235,20 @@ def prompt_phishing_email():
             },
             {
                 "type": "select",
+                "name": "email_account",
+                "message": "Which email account to use?",
+                "choices": EmailAccount.choices(),
+            },
+            {
+                "type": "select",
                 "name": "template",
-                "message": "Select template",
+                "message": "Which template to use?",
                 "choices": PhishingEmailTemplate.choices(),
             },
             {
                 "type": "select",
                 "name": "attachments",
-                "message": "Select attachment",
+                "message": "Which attachment to use?",
                 "choices": Attachment.choices(),
             },
         ]
@@ -214,12 +262,14 @@ def prompt_phishing_email():
 
     template = PhishingEmailTemplate.get(id=answers["template"])
     attachment = Attachment.get(id=answers["attachments"])
+    email_account = EmailAccount.get(id=answers["email_account"])
 
     for target in targets:
         phishing_email = PhishingEmail.create(
             target=target,
             template=template,
             attachment=attachment,
+            email_account=email_account,
             celery_task_id=uuid.uuid4().hex,
             status="pending",
         )

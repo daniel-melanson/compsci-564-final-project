@@ -1,6 +1,10 @@
 import logging
 
 import jinja2
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
 from c2.models import db, PhishingEmail
 from celery import Celery
@@ -26,5 +30,26 @@ def send_phishing_email(phishing_email_id: int):
 
     body = body_template.render(target=phishing_email.target)
 
-    logger.info(subject)
-    logger.info(body)
+    email_account = phishing_email.email_account
+    with smtplib.SMTP(email_account.smtp_server, email_account.smtp_port) as server:
+        server.login(email_account.username, email_account.password)
+        msg = MIMEMultipart()
+
+        msg["From"] = email_account.username
+        msg["To"] = phishing_email.target.email
+        msg["Subject"] = subject
+
+        msg.attach(MIMEText(body, "html"))
+        with open(phishing_email.attachment.path, "rb") as f:
+            attachment = MIMEApplication(f.read())
+            attachment.add_header(
+                "Content-Disposition",
+                f"attachment; filename={phishing_email.attachment.name}",
+            )
+            msg.attach(attachment)
+
+        server.send_message(msg)
+
+    with db.transaction():
+        phishing_email.status = "completed"
+        phishing_email.save()

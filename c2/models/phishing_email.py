@@ -5,6 +5,7 @@ from tabulate import tabulate
 
 from .base import BaseModel
 from .attachment import Attachment
+from .email_account import EmailAccount
 from .phishing_email_template import PhishingEmailTemplate
 from .target import Target
 
@@ -13,6 +14,9 @@ class PhishingEmail(BaseModel):
     id = AutoField(primary_key=True)
     target = ForeignKeyField(
         Target, on_delete="CASCADE", related_name="phishing_emails"
+    )
+    email_account = ForeignKeyField(
+        EmailAccount, on_delete="CASCADE", related_name="phishing_emails"
     )
     template = ForeignKeyField(
         PhishingEmailTemplate, on_delete="CASCADE", related_name="phishing_emails"
@@ -26,7 +30,7 @@ class PhishingEmail(BaseModel):
     status = CharField()
 
     def __str__(self):
-        return f"PhishingEmail[{self.id}] (target='{self.target.email}', template='{self.template.name}')"
+        return f"PhishingEmail[{self.id}] (target='{self.target.email}', template='{self.template.name}', email_account='{self.email_account.name}')"
 
     @classmethod
     def clear(cls):
