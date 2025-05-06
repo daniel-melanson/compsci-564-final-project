@@ -70,7 +70,7 @@ def import_targets_from_csv():
         if validate_target_data(data) != True:
             raise Exception(f"Invalid data: {data}")
 
-        target = cls.create(
+        target = Target.create(
             email=email,
             data=json.loads(data),
             fingerprint=get_fingerprint(email),
