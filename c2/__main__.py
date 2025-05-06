@@ -116,6 +116,11 @@ def main():
                     prompt_phishing_email()
                 case "list":
                     PhishingEmail.list()
+                case "clear":
+                    if questionary.confirm(
+                        "Are you sure you want to delete all phishing emails?"
+                    ).ask():
+                        PhishingEmail.clear()
 
 
 if __name__ == "__main__":
