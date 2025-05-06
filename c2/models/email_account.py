@@ -5,19 +5,6 @@ from tabulate import tabulate
 from .base import BaseModel
 
 
-def validate_email_account_name(name: str):
-    name = name.strip()
-    if name == "":
-        return "Name cannot be empty"
-    elif len(name) < 3:
-        return "Name must be at least 3 characters long"
-    elif len(name) > 32:
-        return "Name must be at most 32 characters long"
-    elif EmailAccount.select().where(EmailAccount.name == name).exists():
-        return "Name already exists"
-    return True
-
-
 class EmailAccount(BaseModel):
     id = AutoField(primary_key=True)
     name = CharField(unique=True)

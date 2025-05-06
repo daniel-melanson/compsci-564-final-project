@@ -8,20 +8,6 @@ from tabulate import tabulate
 from .base import BaseModel
 
 
-def validate_group_name(name):
-    name = name.strip()
-    if len(name) < 3:
-        return "Target group name must be at least 3 characters long"
-    elif len(name) > 100:
-        return "Target group name cannot be longer than 100 characters"
-    elif not re.match(r"^[\w ]+$", name):
-        return "Target group name can only contain letters, numbers, and spaces"
-    elif Group.select().where(Group.name == name).exists():
-        return "Target group name already exists"
-    else:
-        return True
-
-
 class Group(BaseModel):
     id = AutoField(primary_key=True)
     name = CharField(unique=True)

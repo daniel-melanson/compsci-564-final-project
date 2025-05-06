@@ -18,6 +18,7 @@ db = PostgresqlExtDatabase(
 
 from .attachment import Attachment
 from .base import BaseModel
+from .email_account import EmailAccount
 from .execution import Execution
 from .group import Group
 from .phishing_email import PhishingEmail
@@ -34,4 +35,5 @@ __all__ = [
     "Execution",
     "Attachment",
     "PhishingEmail",
+    "EmailAccount",
 ]

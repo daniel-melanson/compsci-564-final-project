@@ -17,40 +17,6 @@ def get_fingerprint(email):
     return hashlib.sha256(email.encode()).hexdigest()
 
 
-def validate_target_id(target_id):
-    try:
-        target_id = int(target_id)
-    except ValueError:
-        return "Target ID must be an integer"
-    try:
-        Target.get(id=target_id)
-    except Target.DoesNotExist:
-        return "Target does not exist"
-
-    return True
-
-
-def validate_target_email(email):
-    email = email.strip().lower()
-    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-
-    if not re.match(pattern, email):
-        return "Invalid email address"
-    elif Target.select().where(Target.email == email).exists():
-        return "Target with this email already exists"
-    else:
-        return True
-
-
-def validate_target_data(data):
-    try:
-        json.loads(data)
-    except json.JSONDecodeError:
-        return "Invalid JSON"
-    else:
-        return True
-
-
 class Target(BaseModel):
     id = AutoField(primary_key=True)
     fingerprint = CharField(unique=True)

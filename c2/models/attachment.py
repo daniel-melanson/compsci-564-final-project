@@ -9,18 +9,6 @@ from tabulate import tabulate
 from .base import BaseModel
 
 
-def validate_attachment_name(name):
-    name = name.strip()
-    if len(name) < 3:
-        return "Attachment name must be at least 3 characters long"
-    elif len(name) > 100:
-        return "Attachment name cannot be longer than 100 characters"
-    elif Attachment.select().where(Attachment.name == name).exists():
-        return "Attachment name already exists"
-    else:
-        return True
-
-
 class Attachment(BaseModel):
     id = CharField(primary_key=True, max_length=8)
     name = CharField()
