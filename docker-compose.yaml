@@ -18,7 +18,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
   worker:
     build: .
-    command: ./.venv/bin/celery -A c2.tasks worker -l info
+    command: ./.venv/bin/celery -A c2 worker -l info
     volumes:
       - ${PWD}/c2:/usr/src/c2-server/c2
     depends_on:

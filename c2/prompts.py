@@ -4,23 +4,23 @@ import shutil
 import uuid
 
 import questionary
-from models.attachment import Attachment, validate_attachment_name
-from models.group import Group, validate_group_name
-from models.phishing_email import PhishingEmail
-from models.phishing_email_template import (
+from c2.models.attachment import Attachment, validate_attachment_name
+from c2.models.group import Group, validate_group_name
+from c2.models.phishing_email import PhishingEmail
+from c2.models.phishing_email_template import (
     PhishingEmailTemplate,
     validate_template_name,
     validate_template_subject,
 )
-from models.target import (
+from c2.models.target import (
     Target,
     TargetGroup,
     get_fingerprint,
     validate_target_data,
     validate_target_email,
 )
-from tasks import send_phishing_email
-from models import db
+from c2.tasks import send_phishing_email
+from c2.models import db
 
 
 def prompt_group():
@@ -191,12 +191,9 @@ def prompt_phishing_email():
                 "name": "template",
                 "message": "Select template",
                 "choices": PhishingEmailTemplate.choices(),
-                "validator": lambda template: (
-                    True if len(template) > 0 else "Please select at least one template"
-                ),
             },
             {
-                "type": "checkbox",
+                "type": "select",
                 "name": "attachments",
                 "message": "Select attachment",
                 "choices": Attachment.choices(),
@@ -227,5 +224,3 @@ def prompt_phishing_email():
         phishing_email.save()
 
         questionary.print(f"Created {phishing_email}")
-
-    return phishing_email

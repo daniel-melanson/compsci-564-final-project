@@ -2,7 +2,7 @@ import argparse
 
 import questionary
 
-from models import (
+from c2.models import (
     Attachment,
     Execution,
     Group,
@@ -12,7 +12,7 @@ from models import (
     TargetGroup,
     db,
 )
-from prompts import (
+from c2.prompts import (
     import_targets_from_csv,
     prompt_attachment,
     prompt_group,
@@ -89,7 +89,7 @@ def main():
         case "execution":
             match args.subcommand:
                 case "run":
-                    prompt_email()
+                    prompt_phishing_email()
                 case "schedule":
                     Execution.prompt_and_schedule()
                 case "list":

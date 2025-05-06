@@ -1,22 +1,22 @@
 import logging
 
 import jinja2
+
+from c2.models import db, PhishingEmail
 from celery import Celery
 
-from models.phishing_email import PhishingEmail
+app = Celery("c2")
 
-celery = Celery(
-    "c2_server", broker="redis://redis:6379/0", backend="redis://redis:6379/0"
-)
 
 logger = logging.getLogger(__name__)
 
 
-@celery.task
+@app.task
 def send_phishing_email(phishing_email_id: int):
-    phishing_email = PhishingEmail.get(id=phishing_email_id)
-    phishing_email.status = "running"
-    phishing_email.save()
+    with db.transaction():
+        phishing_email = PhishingEmail.get(id=phishing_email_id)
+        phishing_email.status = "running"
+        phishing_email.save()
 
     subject_template = jinja2.Template(phishing_email.subject)
     subject = subject_template.render(target=phishing_email.target)
