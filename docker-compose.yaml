@@ -21,6 +21,9 @@ services:
     command: ./.venv/bin/celery -A c2 worker -l info
     volumes:
       - ${PWD}/c2:/usr/src/c2-server/c2
+      - ${PWD}/templates:/usr/src/c2-server/templates
+      - ${PWD}/attachments:/usr/src/c2-server/attachments
+      - ${PWD}/implants:/usr/src/c2-server/implants
     depends_on:
       - db
       - redis

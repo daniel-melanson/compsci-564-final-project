@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import shutil
 import uuid
 
@@ -51,7 +52,9 @@ def prompt_phishing_email_template():
         id=id,
         name=name.strip(),
         subject=subject.strip(),
-        path=f"templates/{id}_{name.strip().lower().replace(' ', '_')}.html",
+        path=os.path.join(
+            os.getcwd(), f"templates/{id}_{name.strip().lower().replace(' ', '_')}.html"
+        ),
     )
     shutil.copyfile("templates/default.html", template.path)
     questionary.print(f"Created {template}")
@@ -142,7 +145,9 @@ def prompt_attachment():
         validate=validate_attachment_name,
     ).ask()
     attachment = Attachment.create(
-        id=id, name=name.strip(), path=f"attachments/{id}_{name.strip()}"
+        id=id,
+        name=name.strip(),
+        path=os.path.join(os.getcwd(), f"attachments/{id}_{name.strip()}"),
     )
     with open(attachment.path, "w") as f:
         f.write("")

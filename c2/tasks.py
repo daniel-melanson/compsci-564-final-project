@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 @app.task
 def send_phishing_email(phishing_email_id: int):
     with db.transaction():
-        phishing_email = PhishingEmail.get(id=phishing_email_id)
+        phishing_email: PhishingEmail = PhishingEmail.get(id=phishing_email_id)
         phishing_email.status = "running"
         phishing_email.save()
 
-    subject_template = jinja2.Template(phishing_email.subject)
+    subject_template = jinja2.Template(phishing_email.template.subject)
     subject = subject_template.render(target=phishing_email.target)
 
     with open(phishing_email.template.path, "r") as f:
@@ -28,5 +28,3 @@ def send_phishing_email(phishing_email_id: int):
 
     logger.info(subject)
     logger.info(body)
-
-    logger.info("send_phishing_email")
