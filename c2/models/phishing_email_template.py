@@ -29,7 +29,8 @@ class PhishingEmailTemplate(BaseModel):
     @classmethod
     def clear(cls):
         for template in cls.select():
-            os.remove(template.path)
+            if os.path.exists(template.path):
+                os.remove(template.path)
 
         cls.delete().execute()
 

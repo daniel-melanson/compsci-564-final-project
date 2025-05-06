@@ -21,7 +21,8 @@ class Attachment(BaseModel):
     @classmethod
     def clear(cls):
         for attachment in cls.select():
-            os.remove(attachment.path)
+            if os.path.exists(attachment.path):
+                os.remove(attachment.path)
         cls.delete().execute()
 
     @classmethod

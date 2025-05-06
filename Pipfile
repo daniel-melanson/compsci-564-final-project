@@ -13,6 +13,8 @@ faker = "*"
 black = "*"
 jinja2 = "*"
 isort = "*"
+flask = "*"
+cryptography = "*"
 
 [dev-packages]
 
