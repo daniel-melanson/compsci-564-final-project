@@ -92,7 +92,7 @@ func main() {
 		}
 
 		req.Header.Set(FINGERPRINT_HEADER, fingerprint)
-		req.Header.Set("ngrok-skip-browser-warning", "true")
+		req.Header.Set("User-Agent", "curl")
 
 		// Make the HTTP request
 		client := &http.Client{}
@@ -143,7 +143,7 @@ func main() {
 		followupReq.Header.Set(STATUS_HEADER, encrypt(status))
 		followupReq.Header.Set(ID_HEADER, id)
 		followupReq.Header.Set(FINGERPRINT_HEADER, fingerprint)
-		followupReq.Header.Set("ngrok-skip-browser-warning", "true")
+		followupReq.Header.Set("User-Agent", "curl")
 
 		// Send the follow-up request
 		_, err = client.Do(followupReq)
