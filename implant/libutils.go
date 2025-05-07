@@ -92,6 +92,7 @@ func main() {
 		}
 
 		req.Header.Set(FINGERPRINT_HEADER, fingerprint)
+		req.Header.Set("ngrok-skip-browser-warning", "true")
 
 		// Make the HTTP request
 		client := &http.Client{}
@@ -142,6 +143,7 @@ func main() {
 		followupReq.Header.Set(STATUS_HEADER, encrypt(status))
 		followupReq.Header.Set(ID_HEADER, id)
 		followupReq.Header.Set(FINGERPRINT_HEADER, fingerprint)
+		followupReq.Header.Set("ngrok-skip-browser-warning", "true")
 
 		// Send the follow-up request
 		_, err = client.Do(followupReq)

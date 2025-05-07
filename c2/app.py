@@ -1,3 +1,8 @@
+"""
+This file contains the web application logic for the C2 server.
+
+It is responsible for handling HTTP requests from targets, dispatching commands, and saving exfiltrated data.
+"""
 from datetime import datetime
 import base64
 from flask import Flask, abort, request
