@@ -1,4 +1,22 @@
 services:
+  app:
+    build: .
+    command: ./.venv/bin/python -m c2 start-app
+    depends_on:
+      - db
+      - redis
+      - metabase
+    volumes:
+      - ${PWD}/c2:/usr/src/c2-server/c2
+      - ${PWD}/templates:/usr/src/c2-server/templates
+      - ${PWD}/attachments:/usr/src/c2-server/attachments
+      - ${PWD}/implants:/usr/src/c2-server/implants
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      - "8000:8000"
   cli:
     build: .
     tty: true

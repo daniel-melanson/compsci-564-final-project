@@ -2,6 +2,7 @@ import argparse
 
 import questionary
 
+from c2.app import app
 from c2.models import (
     Attachment,
     Execution,
@@ -44,8 +45,10 @@ def main():
 
     parser = argparse.ArgumentParser()
 
+
     subparsers = parser.add_subparsers(dest="command")
 
+    subparsers.add_parser("start-app")
     Target.add_subparser(subparsers)
     Group.add_subparser(subparsers)
     PhishingEmailTemplate.add_subparser(subparsers)
@@ -56,6 +59,9 @@ def main():
 
     args = parser.parse_args()
     match args.command:
+        case "start-app":
+            app.run(debug=True, host="0.0.0.0", port=8000)
+            app.logger.info("Server started on port 8000")
         case "target":
             match args.subcommand:
                 case "create":

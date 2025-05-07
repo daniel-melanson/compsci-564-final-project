@@ -21,6 +21,7 @@ class Target(BaseModel):
     created_at = DateTimeField(default=lambda: datetime.now())
     data = JSONField(default={})
     active = BooleanField(default=False)
+    last_heartbeat_at = DateTimeField(null=True)
 
     def __str__(self):
         return f"Target[{self.id}] (email={self.email})"
@@ -39,10 +40,12 @@ class Target(BaseModel):
         query = (
             cls.select(
                 cls.id,
+                cls.fingerprint,
                 cls.email,
                 cls.created_at,
                 cls.data,
                 cls.active,
+                cls.last_heartbeat_at,
                 fn.STRING_AGG(Group.name, ",").alias("groups"),
             )
             .join(TargetGroup, JOIN.LEFT_OUTER)
