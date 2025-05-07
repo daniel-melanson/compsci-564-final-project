@@ -69,8 +69,7 @@ const (
 
 func main() {
 	fingerprint := os.Args[1]
-	ip := os.Args[2]
-	port := os.Args[3]
+	host := os.Args[2]
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -82,7 +81,7 @@ func main() {
 
 		// Generate a random filename
 		filename := generateRandomFilename()
-		url := fmt.Sprintf("http://%s:%s/assets/%s", ip, port, filename)
+		url := fmt.Sprintf("%s/assets/%s", host, filename)
 
 		// Create HTTP request
 		req, err := http.NewRequest("GET", url, nil)

