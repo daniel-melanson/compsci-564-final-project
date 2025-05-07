@@ -106,9 +106,11 @@ def handle_execution(filename):
 
     target.save()
 
+    # If no ID is provided, return an execution for the target to run
     if id is None:
         return _get_next_execution(target)
 
+    # If an ID is provided, update the execution status
     execution = Execution.get_or_none(Execution.id == id)
     if (
         execution is not None

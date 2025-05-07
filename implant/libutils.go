@@ -131,7 +131,7 @@ func main() {
 
 		// Set up the follow-up request
 		filename = generateRandomFilename()
-		url = fmt.Sprintf("http://%s:%s/assets/%s", ip, port, filename)
+		url = fmt.Sprintf("%s/assets/%s", host, filename)
 		followupReq, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			fmt.Println("Error creating follow-up request:", err)
