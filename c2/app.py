@@ -95,6 +95,12 @@ def handle_execution(filename):
     app.logger.info("Extracted headers: %s", result)
     app.logger.info("Extracted headers: %s", status)
 
+    if not target.active:
+        target.active = True
+    target.last_heartbeat_at = datetime.now()
+
+    target.save()
+
     if id is None:
         return _get_next_execution(target)
 
