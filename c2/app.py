@@ -91,3 +91,7 @@ def handle_execution(path):
         execution.save()
 
     return "Internal Server Error", 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
