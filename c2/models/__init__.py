@@ -1,3 +1,6 @@
+"""
+This module contains all database logic and ORM models for the C2 server.
+"""
 import psycopg2
 from playhouse.postgres_ext import *
 

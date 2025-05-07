@@ -1,3 +1,6 @@
+"""
+This file contains all the prompting and record creation logic.
+"""
 import csv
 import json
 import os
@@ -259,7 +262,7 @@ def prompt_phishing_email():
             {
                 "type": "confirm",
                 "name": "random_offset",
-                "message": "Add random offset to execution time?",
+                "message": "Add random offset to execution time",
             },
             {
                 "type": "text",
@@ -285,6 +288,7 @@ def prompt_phishing_email():
             status="pending",
         )
 
+        # If a random offset is specified, spread out the emails
         if answers["random_offset"]:
             max_offset = int(duration_to_seconds(answers["random_offset_duration"]))
             offset = random.randint(max_offset // 10, max_offset)
@@ -420,6 +424,8 @@ def prompt_and_schedule_execution():
 
     for target in _get_targets(answers):
         run_at = datetime.fromisoformat(answers["date"])
+
+        # If a random offset is specified, spread out the execution times
         if "random_offset" in answers and answers["random_offset"]:
             max_offset = int(duration_to_seconds(answers["random_offset_duration"]))
             run_at += timedelta(seconds=random.randint(max_offset // 10, max_offset))

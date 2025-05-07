@@ -1,3 +1,18 @@
+"""
+This is a C2 CLI for managing a phishing campaign.
+
+Usage:
+    c2 <command>
+
+    c2 start-app                        - Start the C2 server that the implants connect to
+    c2 target <subcommand>              - Manage targets (users to phish)
+    c2 group <subcommand>               - Manage groups (collections of targets)
+    c2 template <subcommand>            - Manage phishing email templates
+    c2 execution <subcommand>           - Manage executions (commands to run on target machines)
+    c2 attachment <subcommand>          - Manage attachments (files to send to targets in phishing emails)
+    c2 phishing-email <subcommand>      - Manage phishing emails (emails to send to targets)
+    c2 email-account <subcommand>       - Manage email accounts (email accounts to send phishing emails from)
+"""
 import argparse
 
 import questionary

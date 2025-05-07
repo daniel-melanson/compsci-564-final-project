@@ -36,8 +36,9 @@ The implant is a compiled Go executable. It is lightweight, modular, and capable
 
 ## Communication Protocol
 
-
+The C2 server and implants communicate over HTTP/HTTPS using custom headers to ensure that the communication is not detected by firewalls or intrusion detection systems. Header values are base64 encoded.
 
 ## Command & Control Server
+
 
 

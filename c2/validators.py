@@ -1,3 +1,7 @@
+"""
+This fule contains miscellanious validators for user input.
+"""
+
 import json
 import re
 from datetime import datetime

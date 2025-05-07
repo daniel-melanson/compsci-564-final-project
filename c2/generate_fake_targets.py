@@ -1,3 +1,7 @@
+"""
+This file generates fake targets for testing.
+"""
+
 import csv
 import json
 import random
@@ -44,9 +48,6 @@ def rand_employee():
 with open("targets.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerow(["email", "data", "groups"])
-
-    _, data, groups = rand_employee()
-    writer.writerow(["cs564-melanson-lacy@proton.me", data, groups])
 
     for _ in range(9):
         writer.writerow(rand_employee())
