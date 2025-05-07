@@ -5,6 +5,9 @@ import sys
 import time
 
 
+# Opens connection, sends commands, receives reponses, and prints them to the console
+# TODO: save responses (and commands? to database), associate each response with a fingerprint -- might need to pass fingerprint as an argument to implant
+
 
 def get_public_ip():
     try:
