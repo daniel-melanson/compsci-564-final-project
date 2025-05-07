@@ -5,9 +5,10 @@
 A Command & Control server for managing a malware campaign and bot net.
 
 **Features:**
+
 - CLI to manage implants, targets, groups of targets, phishing emails, scheduled and repeated tasks, and data exfiltration
-- Implant and vulnerability agnostic
-- Target specific implants, tasks, and exfiltrations
+- Vulnerability agnostic
+- Send templated spear phishing emails to targets or groups of targets
 - Dashboard to interact with C2 database: Search, filter, update targets/tasks/collected data
 
 ## Threat Model
@@ -30,7 +31,7 @@ This vulnerability is particularly dangerous because office documents are common
 
 ## Malicious Attachment and Implant
 
-The exploits are enabled by specially crafted .fdot LibreOffice documents. These malicious documents, sent as attachments to the target emails, contain hyperlinks which execute python functions within the LibreOffice macros. We exploit this behavior to by executing commands on the target device with a call to os.system. When opened, the files will first execute a command to download the implant from a public GitHub repository (with a shortened, obfuscated url) and second, add a command to run the implant to the systems bash profile causing it the implant to run whenever the user logs into their computer. This can all be done without any warnings or output on the target system. 
+The exploits are enabled by specially crafted .fdot LibreOffice documents. These malicious documents, sent as attachments to the target emails, contain hyperlinks which execute python functions within the LibreOffice macros. We exploit this behavior to by executing commands on the target device with a call to os.system. When opened, the files will first execute a command to download the implant from a public GitHub repository (with a shortened, obfuscated url) and second, add a command to run the implant to the systems bash profile causing it the implant to run whenever the user logs into their computer. This can all be done without any warnings or output on the target system.
 
 The implant is a compiled Go executable. It is lightweight, modular, and capable of executing commands received from the C2 server. Its functionality includes a "kill" mechanism to delete the implant from the target if needed. When it is running, it continuously tries to connect to the C2 server, read commands, execute those commands, and send the output back to the C2.
 
@@ -40,5 +41,12 @@ The C2 server and implants communicate over HTTP/HTTPS using custom headers to e
 
 ## Command & Control Server
 
+![./arch.png](./arch.png)
 
+### Componets
 
+- C2 Flask App: A web application for implants to connect to get commands and update a commands status
+- C2 CLI: A command line interface for managing implants, targets, groups of targets, phishing emails, scheduled and repeated tasks, and data exfiltration.
+- Celery: A task queue for executing tasks asynchronously. Such as emails or scheduled tasks.
+- PostgreSQL: A database for storing data.
+- Metabase: A dashboard for interacting with the C2 database: search, filter, update targets/tasks/collected data.
